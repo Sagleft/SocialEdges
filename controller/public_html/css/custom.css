@@ -1,3 +1,9 @@
+.showreel-body {
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+}
+
 .github-btn {
 	position: relative;
 	top: 5px;
