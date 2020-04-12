@@ -29,7 +29,7 @@ function css3DAvatar(hash, x, y, z, opacity, uid) {
 	img.className = 'pointAvatar';
 	img.id = uid;
 	//img.src = 'https://www.gravatar.com/avatar/'+hash+'?s=256&d=robohash&r=g';
-	img.src = '/img/circle.png';
+	img.src = '/img/avatar.png';
 	img.style.opacity = opacity;
 
 	var avatar = new THREE.CSS3DObject( img );
