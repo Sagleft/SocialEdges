@@ -24,6 +24,7 @@ $(document).ready(function(){
 
 	var scene = new THREE.Scene();
 	var selectedObject = null;
+	var group = new THREE.Group();
 
 	var camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	camera.position.z = 6.5;
@@ -117,14 +118,17 @@ $(document).ready(function(){
 			};
 			sprite.userData = pointDataObject;
 			//sprite.parent = spritesParentObj;
-			scene.add( sprite );
+			group.add( sprite );
+			//scene.add( sprite );
 		}
+		scene.add( group );
 		transition();
 	}
 
 	function initUsers(json) {
 		var data_arr = JSON.parse(json);
 		var users_data = data_arr.data;
+		//TODO: разбирать вывод ошибок (data_arr.error) и статуса (data_arr.status)
 
 		var points = users_data.length;
 		var index_from = 0;
@@ -180,7 +184,7 @@ $(document).ready(function(){
 			var pointDataObject = {
 				index: i,
 				uid: users_data[i].id,
-				nick: users_data[i].login,
+				nick: users_data[i].nick_name,
 				hash: users_data[i].hash,
 				is_selected: false,
 				scale_min: FAI_scale,
@@ -240,6 +244,7 @@ $(document).ready(function(){
 
 	//console.log(testTexture);
 
+	var animationRotateAngularSpeed = Math.PI / 180;
 	function animate() {
 		requestAnimationFrame( animate );
 		//controls.update();
@@ -248,7 +253,7 @@ $(document).ready(function(){
 		sprites_arr.forEach(function(item, i, arr) {
 			item.lookAt(camera.position);
 		});
-		//spritesParentObj.rotateY(Math.PI / 180);
+		//group.rotateY(Math.PI / 180);
 
 		rendererWebGL.render( scene, camera );
 		renderer.render( scene, camera );
@@ -265,47 +270,6 @@ $(document).ready(function(){
 		raycaster.ray.origin.copy( camera.position );
 		raycaster.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
 	}
-
-	/*function onMouseDown( event ) {
-		raycaster = new THREE.Raycaster();
-		mouse = new THREE.Vector2();
-
-		mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-		mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
-
-		setFromCamera(raycaster, mouse, camera );
-
-		var intersects = raycaster.intersectObjects( scene.children );
-
-		if ( intersects.length > 0 ) {
-			var obj = intersects[ 0 ].object;
-			console.log("клик по: "+obj.geometry.type);
-			switch(obj.geometry.type){
-				case 'BufferGeometry':
-					//console.log('HIT BufferGeometry');
-					if(last_selected_point != null && last_selected_point != obj) {
-						last_selected_point.scale.set(obj.userData.scale_min, obj.userData.scale_min, obj.userData.scale_min);
-						last_selected_point.userData.is_selected = false;
-						last_selected_point = null;
-					}
-					if(obj.userData.is_selected) {
-						obj.scale.set(obj.userData.scale_min, obj.userData.scale_min, obj.userData.scale_min);
-						last_selected_point = null;
-					} else {
-						obj.scale.set(obj.userData.scale_max, obj.userData.scale_max, obj.userData.scale_max);
-						last_selected_point = obj;
-					}
-					obj.userData.is_selected = !obj.userData.is_selected;
-					$("#pointInfo_container").show();
-					$("#pointInfo_userNick").html(obj.userData.nick);
-					$("#pintInfo_userID").html("ID: " + obj.userData.uid);
-					$("#pointInfo_userAvatar").attr('src', 'https://www.gravatar.com/avatar/'+obj.userData.hash+'?s=128&d=robohash&r=g');
-					break;
-				default:
-					break;
-			}
-		}
-	}*/
 
 	window.addEventListener( 'resize', onWindowResize, false );
 	//window.addEventListener( "mousemove", onDocumentMouseMove, false );
@@ -326,6 +290,7 @@ $(document).ready(function(){
 		var duration = 2000;
 		for ( var i = 0; i < sprites_arrIndexed.length; i ++) {
 			var object = sprites_arrIndexed[ i ];
+			//анимация на каждый аватар - полет к точкам на сфере
 			new TWEEN.Tween( object.position )
 				.to( {
 					x: spherical_positions[ i ][0],
@@ -335,16 +300,20 @@ $(document).ready(function(){
 				.easing( TWEEN.Easing.Exponential.InOut )
 				.start();
 		}
+		//console.log(group.rotation);
+		//анимация на вращение группы аватаров
+		new TWEEN.Tween( group.rotation )
+			.to( {
+				x: group.rotation.x,
+				y: group.rotation.y + Math.PI,
+				z: group.rotation.z
+			}, duration * 1.5 )
+			.easing( TWEEN.Easing.Exponential.InOut )
+			.start();
 		new TWEEN.Tween( this )
 			.to( {}, duration * 3 )
 			.onComplete( transition )
 			.start();
 		//current = ( current + 1 ) % 4;
 	}
-
-	/* for(var i=0; i<sprites_arrIndexed.length; i++) {
-		$('.pointAvatar#'+i).on('click', function(){
-			console.log("click on element");
-		});
-	} */
 });
