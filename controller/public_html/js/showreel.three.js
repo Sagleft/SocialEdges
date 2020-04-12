@@ -27,7 +27,7 @@ $(document).ready(function(){
 	var group = new THREE.Group();
 
 	var camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
-	camera.position.z = 6.5;
+	camera.position.z = 3;
 	//var controls = new THREE.OrbitControls( camera );
 
 	var rendererWebGL = new THREE.WebGLRenderer({
