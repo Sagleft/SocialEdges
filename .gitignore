@@ -1,5 +1,6 @@
 /controller/vendor/**
 /view/cache/**
+/logs/**
 .env
 .htaccess
 *.bak
