@@ -11,10 +11,10 @@
 				</div>
 			</div>
 			{% include 'parts/footer.tmpl' %}
-			{% include 'parts/scripts.tmpl' %}
 		{% else %}
 			<body class="showreel-body">
 			{% include 'pages/'~page.tag~'.tmpl' %}
 		{% endif %}
+		{% include 'parts/scripts.tmpl' %}
 	</body>
 </html>
