@@ -5,3 +5,4 @@
 .htaccess
 *.bak
 *.log
+composer.lock
