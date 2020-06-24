@@ -44,4 +44,45 @@
 		public function redirect($url = '/') {
 			header('Location: ' . $url); exit;
 		}
+
+		public function isAuth(): bool {
+			return $this->data['is_auth'];
+		}
+
+		public function authRequest(): void {
+			$query = http_build_query([
+				'client_id'     => getenv('oauth_client_id'),
+				'redirect_url'  => getenv('oauth_redirect_url'),
+				'response_type' => 'code',
+				'scope'         => ''
+			]);
+			$this->redirect('https://profile.mfcoin.net/oauth/authorize?' . $query);
+		}
+
+		protected function parseResponse($response): array {
+			return json_decode((string) $response->getBody(), true);
+    	}
+
+		public function getUserData($code): array {
+	        $response = $this->client->post('https://profile.mfcoin.net/oauth/token', [
+	            'body' => [
+	                'grant_type'    => 'authorization_code',
+	                'client_id'     => $this->config['oauth_client_id'],
+	                'client_secret' => $this->config['oauth_secret'],
+	                'redirect_uri'  => $this->config['oauth_redirect_url'],
+	                'code'          => $code
+	            ]
+	        ]);
+
+	        return $this->parseResponse($response);
+	    }
+
+		public function finishAuth($code = ''): void {
+			if($this->isAuth() || empty($code)) {
+				return;
+			}
+			$user_data = $this->getUserData($code);
+			//проверим, есть ли такой юзер
+			//TODO
+		}
 	}
